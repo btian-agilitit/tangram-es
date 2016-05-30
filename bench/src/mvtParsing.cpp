@@ -83,7 +83,7 @@ BENCHMARK_DEFINE_F(MVTParsingFixture, BuildTest)(benchmark::State& st) {
         TileID tileId{0,0,10,10,0};
         Tile tile(tileId, ctx.projection);
 
-        auto task = std::make_shared<DownloadTileTask>(tileId, ctx.source);
+        auto task = std::make_shared<DownloadTileTask>(tileId, ctx.source, -1);
         task->rawTileData = ctx.rawTileData;
 
         bool ok = ctx.source->process(*task, ctx.projection, ctx.sink);
