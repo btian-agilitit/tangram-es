@@ -69,18 +69,17 @@ std::unique_ptr<StyledMesh> TextStyleBuilder::build() {
         for (auto& label : m_labels) {
             auto* textLabel = static_cast<TextLabel*>(label.get());
 
-            //Range range = textLabel->quadRange();
-
             std::vector<TextRange>& ranges = textLabel->textRanges();
+            if (ranges.empty()) {
+                // FIXME when does this happen?
+                continue;
+            }
 
             bool active = textLabel->state() != Label::State::dead;
 
-            for (auto& textRange : ranges) {
-                auto& range = textRange.range;
-                if (range.end() != quadPos) {
-                    quadPos = range.end();
-                    added = false;
-                }
+            if (ranges.back().range.end() != quadPos) {
+                quadPos = ranges.back().range.end();
+                added = false;
             }
 
             if (!active) { continue; }
@@ -89,10 +88,7 @@ std::unique_ptr<StyledMesh> TextStyleBuilder::build() {
             if (!added) {
                 added = true;
 
-                for (auto& textRange : ranges) {
-                    auto& range = textRange.range;
-                    sumQuads += range.length;
-                }
+                sumQuads += ranges[0].range.length * ranges.size();
             }
         }
 
@@ -110,39 +106,33 @@ std::unique_ptr<StyledMesh> TextStyleBuilder::build() {
         for (auto& label : m_labels) {
             auto* textLabel = static_cast<TextLabel*>(label.get());
 
-            std::vector<TextRange>& ranges = textLabel->textRanges();
             bool active = textLabel->state() != Label::State::dead;
+            if (!active) { continue; }
 
+            std::vector<TextRange>& ranges = textLabel->textRanges();
             if (ranges.empty()) {
                 // FIXME when does this happen?
                 continue;
             }
 
-
-            auto& range = ranges.back().range;
-            if (range.end() != quadPos) {
+            // Add the quads of line-labels only once
+            if (ranges.back().range.end() != quadPos) {
                 quadStart = quadEnd;
-                quadPos = range.end();
-                added = false;
-            }
-
-            if (!active) { continue; }
-            if (!added) {
-                added = true;
+                quadPos = ranges.back().range.end();
 
                 for (auto& textRange : ranges) {
-                    auto& range = textRange.range;
-                    quadEnd += range.length;
+                    quadEnd += textRange.range.length;
 
-                    auto it = m_quads.begin() + range.start;
-                    quads.insert(quads.end(), it, it + range.length);
+                    auto it = m_quads.begin() + textRange.range.start;
+                    quads.insert(quads.end(), it, it + textRange.range.length);
                 }
             }
 
-            int start = ranges[0].range.start;
+            // Update TextRange
             ranges[0].range.start = quadStart;
+
             for (int i = 1; i < ranges.size(); ++i) {
-                ranges[i].range.start = quadStart + (ranges[i].range.start - start);
+                ranges[i].range.start = ranges[i-1].range.end();
             }
 
             labels.push_back(std::move(label));
