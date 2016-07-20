@@ -129,10 +129,12 @@ std::unique_ptr<StyledMesh> TextStyleBuilder::build() {
             }
 
             // Update TextRange
-            ranges[0].range.start = quadStart;
+            auto start = quadStart;
+            auto nQuads = ranges[0].range.length;
 
-            for (int i = 1; i < ranges.size(); ++i) {
-                ranges[i].range.start = ranges[i-1].range.end();
+            for (auto& textRange : ranges) {
+                textRange.range.start = start;
+                start += nQuads;
             }
 
             labels.push_back(std::move(label));
@@ -367,7 +369,7 @@ TextStyle::Parameters TextStyleBuilder::applyRule(const DrawRule& _rule,
         std::vector<std::string> anchors = splitString(a, ',');
 
         if (anchors.size() > 1) {
-            for (int i = 0; i < anchors.size(); ++i) {
+            for (size_t i = 0; i < anchors.size(); ++i) {
                 LabelProperty::Anchor labelAnchor;
                 if (LabelProperty::anchor(anchors[i], labelAnchor)) {
                     p.labelOptions.anchorFallback.push_back(labelAnchor);
