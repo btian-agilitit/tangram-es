@@ -28,19 +28,19 @@ public:
     enum class Type {
         point,
         line,
-        debug
+        debug,
     };
 
     enum State {
-        fading_in       = 1,
-        fading_out      = 1 << 1,
-        visible         = 1 << 2,
-        sleep           = 1 << 3,
-        out_of_screen   = 1 << 4,
-        anchor_fallback = 1 << 5,
-        wait_occ        = 1 << 6, // state waiting for first occlusion result
-        skip_transition = 1 << 7,
-        dead            = 1 << 8,
+        fading_in               = 1 << 0,
+        fading_out              = 1 << 1,
+        visible                 = 1 << 2,
+        sleep                   = 1 << 3,
+        out_of_screen           = 1 << 4,
+        anchor_fallback         = 1 << 5,
+        wait_occlusion_check    = 1 << 6,
+        skip_transition         = 1 << 7,
+        dead                    = 1 << 8,
     };
 
     struct Transform {
