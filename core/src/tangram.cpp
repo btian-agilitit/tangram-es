@@ -288,7 +288,10 @@ bool Map::update(float _dt) {
 
         auto& tiles = m_tileManager->getVisibleTiles();
 
-        if (m_view->changedOnLastUpdate() ||
+        const bool mustUpdateLabels = true;
+
+        if (mustUpdateLabels ||
+            m_view->changedOnLastUpdate() ||
             m_tileManager->hasTileSetChanged()) {
 
             for (const auto& tile : tiles) {
