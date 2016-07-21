@@ -298,7 +298,7 @@ bool Map::update(float _dt) {
                 tile->update(_dt, *m_view);
             }
             m_labels->updateLabelSet(*m_view, _dt, m_scene->styles(), tiles,
-                                     m_tileManager->getTileCache());
+                                     *m_tileManager->getTileCache());
 
         } else {
             m_labels->updateLabels(*m_view, _dt, m_scene->styles(), tiles);
